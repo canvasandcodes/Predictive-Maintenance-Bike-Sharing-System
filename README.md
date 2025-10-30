@@ -1,8 +1,8 @@
 # 🚴 Complete Predictive Maintenance System for Bike Sharing
 
-## 📦 What You Get - Complete Package
+## 📦 What I created - A Complete Package
 
-This ZIP file contains everything you need to deploy a production-ready predictive maintenance system for bike sharing fleets:
+This file contains everything you need to deploy a production-ready predictive maintenance system for bike sharing fleets:
 
 ### 🌟 LIVE DEMO
 **Try it now:** https://ppl-ai-code-interpreter-files.s3.amazonaws.com/web/direct-files/de2cda07f77ad0c22cc34ba1c107b23b/13fe3742-274b-4e9f-aced-5125e3940c86/index.html
