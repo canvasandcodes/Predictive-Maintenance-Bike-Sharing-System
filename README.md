@@ -266,3 +266,8 @@ COMPLETE_Predictive_Maintenance_Bike_Sharing_System/
 **Questions?** Check the API docs at `/docs` or examine the live demo code.
 
 **Built for bike sharing operations worldwide! 🌍🚴‍♂️**
+
+**👩‍💻 Author**
+Namita S
+Data Science Enthusiast | FastAPI & React Developer
+📧 [namitascreates@gmail.com]
