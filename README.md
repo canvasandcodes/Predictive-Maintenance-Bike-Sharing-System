@@ -253,7 +253,7 @@ COMPLETE_Predictive_Maintenance_Bike_Sharing_System/
 
 ## 🎊 Ready to Deploy!
 
-**Everything you need is in this ZIP file:**
+**Everything we need:**
 - ✅ Live demo you can try right now
 - ✅ Complete source code for customization
 - ✅ Docker deployment for any environment
