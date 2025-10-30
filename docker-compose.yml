@@ -1,0 +1,108 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15
+    container_name: bike_maintenance_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-infotactintern}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${POSTGRES_DB:-bike_maintenance_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bike_maintenance_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-infotactintern}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # InfluxDB for time-series data
+  influxdb:
+    image: influxdb:2.0
+    container_name: bike_maintenance_influxdb
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: password123
+      DOCKER_INFLUXDB_INIT_ORG: bike_sharing_org
+      DOCKER_INFLUXDB_INIT_BUCKET: bike_telemetry
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: my-super-secret-auth-token
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    networks:
+      - bike_maintenance_network
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: bike_maintenance_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - bike_maintenance_network
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bike_maintenance_backend
+    environment:
+      DATABASE_URL: postgresql://infotactintern:password@postgres:5432/bike_maintenance_db
+      INFLUXDB_URL: http://influxdb:8086
+      INFLUXDB_TOKEN: my-super-secret-auth-token
+      INFLUXDB_ORG: bike_sharing_org
+      INFLUXDB_BUCKET: bike_telemetry
+      SECRET_KEY: ${SECRET_KEY:-your-super-secret-key-here}
+      MAPBOX_ACCESS_TOKEN: ${MAPBOX_ACCESS_TOKEN}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ml_models:/app/ml_models
+      - bike_data:/app/data
+    depends_on:
+      - postgres
+      - influxdb
+      - redis
+    networks:
+      - bike_maintenance_network
+
+  # React Frontend  
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: bike_maintenance_frontend
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000
+      VITE_MAPBOX_ACCESS_TOKEN: ${MAPBOX_ACCESS_TOKEN}
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    networks:
+      - bike_maintenance_network
+
+volumes:
+  postgres_data:
+  influxdb_data:
+  redis_data:
+  ml_models:
+  bike_data:
+
+networks:
+  bike_maintenance_network:
+    driver: bridge
